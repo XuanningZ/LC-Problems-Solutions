@@ -1,0 +1,82 @@
+199. Binary Tree Right Side View
+class Solution:
+    def rightSideView(self, root: TreeNode) -> List[int]:
+        rightmost_value_at_depth = dict() 
+        max_depth = -1
+
+        stack = [(root, 0)]
+        while stack:
+            node, depth = stack.pop()
+
+            if node is not None:
+    
+                max_depth = max(max_depth, depth)
+
+      
+                rightmost_value_at_depth.setdefault(depth, node.val)
+
+                stack.append((node.left, depth + 1))
+                stack.append((node.right, depth + 1))
+
+        return [rightmost_value_at_depth[depth] for depth in range(max_depth + 1)]
+
+
+329. Longest Increasing Path in a Matrix
+class Solution:
+    def longestIncreasingPath(self, matrix: List[List[int]]) -> int:
+        if not matrix:
+            return 0
+
+        h,w = len(matrix),len(matrix[0])
+
+        store = [[None]*(w) for i in range(h)]
+
+        m = 0 
+
+        def search_nearby(i,j):
+            nonlocal m
+
+            compare = [] 
+
+            if i != 0 and matrix[i-1][j] < matrix[i][j]: 
+                compare.append(store[i-1][j]) if store[i-1][j] else compare.append(search_nearby(i-1,j))
+
+  
+            if j != 0 and matrix[i][j-1] < matrix[i][j]: 
+                compare.append(store[i][j-1]) if store[i][j-1] else compare.append(search_nearby(i,j-1))
+
+     
+            if i != h-1 and matrix[i+1][j] < matrix[i][j]:
+                compare.append(store[i+1][j]) if store[i+1][j] else compare.append(search_nearby(i+1,j))
+
+
+            if j != w-1 and matrix[i][j+1] < matrix[i][j]:
+                compare.append(store[i][j+1]) if store[i][j+1] else compare.append(search_nearby(i,j+1))
+            
+            store[i][j] = max(compare)+1 if compare else 1
+
+            m = max(m,store[i][j])
+            return (store[i][j])
+        
+        for i in range(h):
+            for j in range(w):
+                if not store[i][j]:
+                    search_nearby(i,j)
+        
+        return m
+
+
+230. Kth Smallest Element in a BST
+class Solution:
+    def kthSmallest(self, root: Optional[TreeNode], k: int) -> int:
+        def dfs(root):
+            if not root: return
+            dfs(root.left)
+            if self.k == 0: return
+            self.k -= 1
+            if self.k == 0: self.res = root.val
+            dfs(root.right)
+
+        self.k = k
+        dfs(root)
+        return self.res
